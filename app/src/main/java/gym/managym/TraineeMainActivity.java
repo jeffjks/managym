@@ -49,10 +49,19 @@ public class TraineeMainActivity extends AppCompatActivity {
 
         final Button noticeButton = findViewById(R.id.noticeButton);
         final Button attendButton = findViewById(R.id.attendButton);
+        final Button bodyDataButton = findViewById(R.id.bodyDataButton);
 
         noticeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(TraineeMainActivity.this, NoticeActivity.class);
+                intent.putExtra("userData", userData);
+                startActivity(intent);
+            }
+        });
+
+        bodyDataButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(TraineeMainActivity.this, BodyDataActivity.class);
                 intent.putExtra("userData", userData);
                 startActivity(intent);
             }

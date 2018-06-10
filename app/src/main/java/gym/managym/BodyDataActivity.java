@@ -27,56 +27,55 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NoticeActivity extends AppCompatActivity {
-    private ListView noticeListView;
-    private NoticeListAdapter adapter;
-    private List<NoticeListView> noticeList;
+public class BodyDataActivity extends AppCompatActivity {
+    private ListView bodyDataListView;
+    private BodyListAdapter adapter2;
+    private List<BodyDataListView> bodyDataList;
     private Bundle bundle;
     private UserData userData;
-    public static Activity noticeActivity;
+    public static Activity bodyDataActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_notice);
+        setContentView(R.layout.activity_bodydata);
         bundle = getIntent().getExtras();
         userData = bundle.getParcelable("userData");
-        noticeActivity = NoticeActivity.this;
+        bodyDataActivity = BodyDataActivity.this;
 
         final Button writeButton = findViewById(R.id.writeButton);
 
-        noticeListView = findViewById(R.id.noticeListView);
-        noticeList = new ArrayList<NoticeListView>();
+        bodyDataListView = findViewById(R.id.bodyDataListView);
+        bodyDataList = new ArrayList<BodyDataListView>();
 
-        adapter = new NoticeListAdapter(getApplicationContext(), noticeList);
-        noticeListView.setAdapter(adapter);
+        adapter2 = new BodyListAdapter(getApplicationContext(), bodyDataList);
+        bodyDataListView.setAdapter(adapter2);
 
         new BackgroundTask().execute();
 
         writeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) { // Write Notice
-                Intent intent = new Intent(NoticeActivity.this, NoticeWriteActivity.class);
+                Intent intent = new Intent(BodyDataActivity.this, BodyDataWriteActivity.class);
                 intent.putExtra("userData", userData);
                 intent.putExtra("write", true);
                 startActivity(intent);
                 finish();
             }
         });
-        if (userData.getAdmin() == 0)
-            writeButton.setVisibility(View.GONE);
 
-        noticeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() { // Read Notice
+        bodyDataListView.setOnItemClickListener(new AdapterView.OnItemClickListener() { // Read Notice
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) { // Read Notice
-                String title = noticeList.get(position).getTitle();
-                String name = noticeList.get(position).getName();
-                String date = noticeList.get(position).getDate();
-                String content = noticeList.get(position).getContent();
+                String userID = bodyDataList.get(position).getUserID();
+                double height = bodyDataList.get(position).getHeight();
+                double weight = bodyDataList.get(position).getWeight();
+                String date = bodyDataList.get(position).getDate();
+                double bmi = bodyDataList.get(position).getBmi();
 
-                NoticeData noticeData = new NoticeData(title, name, date, content); // parcelable
-                Intent intent = new Intent(NoticeActivity.this, NoticeContentActivity.class);
+                BodyData bodyData = new BodyData(userID, height, weight, date, bmi); // parcelable
+                Intent intent = new Intent(BodyDataActivity.this, BodyDataContentActivity.class);
                 intent.putExtra("userData", userData);
-                intent.putExtra("noticeData", noticeData);
+                intent.putExtra("BodyData", bodyData);
                 startActivity(intent);
             }
         });
@@ -106,7 +105,7 @@ public class NoticeActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            target = "http://jeffjks.cafe24.com/NoticeList.php";
+            target = "http://jeffjks.cafe24.com/BodyData.php";
         }
 
         @Override
@@ -144,16 +143,18 @@ public class NoticeActivity extends AppCompatActivity {
                 JSONObject jsonObject = new JSONObject(result);
                 JSONArray jsonArray = jsonObject.getJSONArray("response");
                 int count = 0;
-                String noticeTitle, noticeName, noticeDate, noticeContent;
+                String userID, recordDate;
+                double height, weight, bmi;
                 while(count < jsonArray.length()) {
                     JSONObject object = jsonArray.getJSONObject(count);
-                    noticeTitle = object.getString("noticeTitle");
-                    noticeName = object.getString("noticeName");
-                    noticeDate = object.getString("noticeDate");
-                    noticeContent = object.getString("noticeContent");
-                    NoticeListView notice = new NoticeListView(noticeTitle, noticeName, noticeDate, noticeContent);
-                    noticeList.add(notice);
-                    adapter.notifyDataSetChanged();
+                    userID = object.getString("UserID");
+                    height = object.getDouble("Height");
+                    weight = object.getDouble("Weight");
+                    recordDate = object.getString("Date");
+                    bmi = object.getDouble("BMI");
+                    BodyDataListView bodyData = new BodyDataListView(userID, height, weight, recordDate,bmi);
+                    bodyDataList.add(bodyData);
+                    adapter2.notifyDataSetChanged();
                     count++;
                 }
             }
@@ -164,34 +165,34 @@ public class NoticeActivity extends AppCompatActivity {
     }
 }
 
-class NoticeListView {
-    String title;
-    String name;
+class BodyDataListView {
+    String userID;
+    double height;
+    double weight;
     String date;
-    String content;
+    double bmi;
 
-    public NoticeListView(String title, String name, String date, String content) {
-        this.title = title;
-        this.name = name;
+    public BodyDataListView(String userID, double height, double weight, String date, double bmi){
+        this.userID = userID;
+        this.height = height;
+        this.weight = weight;
         this.date = date;
-        this.content = content;
+        this.bmi = weight/(height*height);
     }
 
-    public String getTitle() {
-        return title;
+    public String getUserID() {
+        return userID;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    public void setUserID(String userID) { this.userID = userID;}
 
-    public String getName() {
-        return name;
-    }
+    public double getHeight() { return height; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public void setHeight(double height) { this.height = height; }
+
+    public double getWeight() { return weight; }
+
+    public void setWeight(double weight) { this.weight = weight; }
 
     public String getDate() {
         return date;
@@ -201,34 +202,29 @@ class NoticeListView {
         this.date = date;
     }
 
-    public String getContent() {
-        return content;
-    }
+    public double getBmi() { return bmi; }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
+    public void setBmi(double bmi) { this.bmi = bmi; }
+}
 
-    }
-
-
-class NoticeListAdapter extends BaseAdapter {
+class BodyListAdapter extends BaseAdapter {
     private Context context;
-    private List<NoticeListView> noticeList;
+    private List<BodyDataListView>  bodyDataList;
 
-    public NoticeListAdapter(Context context, List<NoticeListView> noticeList) {
+    public BodyListAdapter(Context context, List<BodyDataListView> bodyDataList) {
         this.context = context;
-        this.noticeList = noticeList;
+        this. bodyDataList =  bodyDataList;
     }
+
 
     @Override
     public int getCount() {
-        return noticeList.size();
+        return bodyDataList.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return noticeList.get(i);
+        return bodyDataList.get(i);
     }
 
     @Override
@@ -238,16 +234,20 @@ class NoticeListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        View v = View.inflate(context, R.layout.activity_notice_listview, null);
-        TextView titleText = v.findViewById(R.id.noticeTitleText);
-        TextView nameText = v.findViewById(R.id.noticeNameText);
-        TextView dateText = v.findViewById(R.id.noticeDateText);
+        View v = View.inflate(context, R.layout.activity_bodydata_listview, null);
+        TextView userIDText = v.findViewById(R.id.userIDText);
+        TextView heightText = v.findViewById(R.id.heightText);
+        TextView weightText = v.findViewById(R.id.weightText);
+        TextView recordDateText = v.findViewById(R.id.recordDateText);
+        TextView bmiText = v.findViewById(R.id.bmiText);
 
-        titleText.setText(noticeList.get(i).getTitle());
-        nameText.setText(noticeList.get(i).getName());
-        dateText.setText(noticeList.get(i).getDate());
+        userIDText.setText(bodyDataList.get(i).getUserID());
+        heightText.setText(String.valueOf(bodyDataList.get(i).getHeight()));
+        weightText.setText(String.valueOf(bodyDataList.get(i).getWeight()));
+        recordDateText.setText(bodyDataList.get(i).getDate());
+        bmiText.setText(String.valueOf(bodyDataList.get(i).getBmi()));
 
-        v.setTag(noticeList.get(i).getTitle());
+        v.setTag(bodyDataList.get(i).getUserID());
         return v;
     }
 }

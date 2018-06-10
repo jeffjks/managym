@@ -19,6 +19,9 @@
                 />
             </intent-filter>
         </activity>
+        <activity android:name=".BodyDataActivity" />
+        <activity android:name=".BodyDataContentActivity" />
+        <activity android:name=".BodyDataWriteActivity" />
         <activity android:name=".TrainerMainActivity" />
         <activity android:name=".TraineeMainActivity" />
         <activity android:name=".NoticeActivity" />

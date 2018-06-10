@@ -2,11 +2,11 @@ package gym.managym;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -21,31 +21,32 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NoticeContentActivity extends AppCompatActivity {
+public class BodyDataContentActivity extends AppCompatActivity {
     private Bundle bundle;
     private UserData userData;
-    private NoticeData noticeData;
+    private BodyData bodyData;
     private AlertDialog dialog;
-    private NoticeActivity noticeActivity = (NoticeActivity) NoticeActivity.noticeActivity;
+    private BodyDataActivity bodyDataActivity = (BodyDataActivity) BodyDataActivity.bodyDataActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notice_content);
 
-        final TextView titleText = findViewById(R.id.noticeTitleText);
-        final TextView nameText = findViewById(R.id.noticeNameText);
-        final TextView dateText = findViewById(R.id.noticeDateText);
-        final TextView contentText = findViewById(R.id.noticeContentText);
+        final TextView userIDText = findViewById(R.id.userIDText);
+        final TextView heightText = findViewById(R.id.heightText);
+        final TextView weightText = findViewById(R.id.weightText);
+        final TextView recordDateText = findViewById(R.id.recordDateText);
+        final TextView bmiText = findViewById(R.id.bmiText);
 
         bundle = getIntent().getExtras();
         userData = bundle.getParcelable("userData");
-        noticeData = bundle.getParcelable("noticeData");
-
-        titleText.setText(noticeData.getTitle());
-        nameText.setText(noticeData.getName());
-        dateText.setText(noticeData.getDate());
-        contentText.setText(noticeData.getContent());
+        bodyData = bundle.getParcelable("noticeData");
+        userIDText.setText(bodyData.getUserID());
+        heightText.setText(String.valueOf(bodyData.getHeight()));
+        weightText.setText(String.valueOf(bodyData.getWeight()));
+        recordDateText.setText(bodyData.getDate());
+        bmiText.setText(String.valueOf(bodyData.getBmi()));
     }
 
     @Override
@@ -62,10 +63,10 @@ public class NoticeContentActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch(id){
             case R.id.menu_action_modify:
-                modifyNotice();
+                modifyBodyData();
                 break;
             case R.id.menu_action_delete:
-                deleteNotice();
+                deleteBodyData();
                 break;
             case R.id.menu_back:
                 finish();
@@ -76,16 +77,17 @@ public class NoticeContentActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void modifyNotice() { // Modify Notice
-        Intent intent = new Intent(NoticeContentActivity.this, NoticeWriteActivity.class);
-        intent.putExtra("noticeData", noticeData);
+
+    private void modifyBodyData() { // Modify Notice
+        Intent intent = new Intent(BodyDataContentActivity.this, BodyDataWriteActivity.class);
+        intent.putExtra("noticeData", bodyData);
         intent.putExtra("userData", userData);
         intent.putExtra("write", false);
         startActivity(intent);
         finish();
     }
 
-    private void deleteNotice() {
+    private void deleteBodyData() {
         Response.Listener<String> responseListener = new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -93,13 +95,13 @@ public class NoticeContentActivity extends AppCompatActivity {
                     JSONObject jsonResponse = new JSONObject(response);
                     boolean success = jsonResponse.getBoolean("success");
                     if (success) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(NoticeContentActivity.this);
-                        builder.setMessage("공지사항을 삭제하시겠습니까?");
+                        AlertDialog.Builder builder = new AlertDialog.Builder(BodyDataContentActivity.this);
+                        builder.setMessage("신체정보를 삭제하시겠습니까?");
                         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
-                                refreshNoticeIntent();
+                                refreshBodyDataIntent();
                             }
                         });
                         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -111,7 +113,7 @@ public class NoticeContentActivity extends AppCompatActivity {
                         builder.create();
                         builder.show();
                     } else {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(NoticeContentActivity.this);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(BodyDataContentActivity.this);
                         dialog = builder.setMessage("Failed").setNegativeButton("Retry", null).create();
                         dialog.show();
                     }
@@ -120,28 +122,28 @@ public class NoticeContentActivity extends AppCompatActivity {
                 }
             }
         };
-        NoticeDelete noticeDelete = new NoticeDelete(noticeData.getDate(), responseListener);
-        RequestQueue queue = Volley.newRequestQueue(NoticeContentActivity.this);
-        queue.add(noticeDelete);
+        BodyDataDelete bodyDataDelete = new BodyDataDelete(bodyData.getDate(), responseListener);
+        RequestQueue queue = Volley.newRequestQueue(BodyDataContentActivity.this);
+        queue.add(bodyDataDelete);
     }
 
-    private void refreshNoticeIntent() {
-        noticeActivity.finish();
-        Intent intent = new Intent(NoticeContentActivity.this, NoticeActivity.class);
+    private void refreshBodyDataIntent() {
+        bodyDataActivity.finish();
+        Intent intent = new Intent(BodyDataContentActivity.this, BodyDataActivity.class);
         intent.putExtra("userData", userData);
         startActivity(intent);
         finish();
     }
 }
 
-class NoticeDelete extends StringRequest {
-    final static private String URL = "http://jeffjks.cafe24.com/NoticeDelete.php";
+class BodyDataDelete extends StringRequest {
+    final static private String URL = "http://jeffjks.cafe24.com/BodyDataDelete.php";
     private Map<String, String> parameters;
 
-    public NoticeDelete(String noticeDate, Response.Listener<String> listener) {
+    public BodyDataDelete(String recordDate, Response.Listener<String> listener) {
         super(Method.POST, URL, listener, null);
         parameters = new HashMap<>();
-        parameters.put("noticeDate", noticeDate);
+        parameters.put("recordDate", recordDate);
     }
 
     @Override
@@ -150,32 +152,34 @@ class NoticeDelete extends StringRequest {
     }
 }
 
-class NoticeData implements Parcelable {
-    private String title;
-    private String name;
+class BodyData implements Parcelable {
+    private String userID;
+    private double height;
+    private double weight;
     private String date;
-    private String content;
+    private double bmi;
 
-    public NoticeData() { }
+    public BodyData() { }
 
-    public NoticeData(Parcel in) {
+    public BodyData(Parcel in) {
         readFromParcel(in);
     }
 
-    public NoticeData(String title, String name, String date, String content) {
-        this.title = title;
-        this.name = name;
+    public BodyData(String userID, double height, double weight, String date, double bmi) {
+        this.userID = userID;
+        this.height = height;
+        this.weight = weight;
         this.date = date;
-        this.content = content;
+        this.bmi = bmi;
     }
 
-    public static final Parcelable.Creator<NoticeData> CREATOR = new Parcelable.Creator<NoticeData>() {
-        public NoticeData createFromParcel(Parcel in) {
-            return new NoticeData(in);
+    public static final Creator<BodyData> CREATOR = new Creator<BodyData>() {
+        public BodyData createFromParcel(Parcel in) {
+            return new BodyData(in);
         }
 
-        public NoticeData [] newArray (int size) {
-            return new NoticeData[size];
+        public BodyData[] newArray (int size) {
+            return new BodyData[size];
         }
     };
 
@@ -183,29 +187,34 @@ class NoticeData implements Parcelable {
         return 0;
     }
 
-    public String getTitle() {
-        return title;
+    public String getUserID() {
+        return userID;
     }
-    public String getName() {
-        return name;
+    public double getHeight() {
+        return height;
+    }
+    public double getWeight() {
+        return weight;
     }
     public String getDate() {
         return date;
     }
-    public String getContent() {
-        return content;
+    public double getBmi() {
+        return bmi;
     }
 
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.title);
-        dest.writeString(this.name);
+        dest.writeString(this.userID);
+        dest.writeDouble(this.height);
+        dest.writeDouble(this.weight);
         dest.writeString(this.date);
-        dest.writeString(this.content);
+        dest.writeDouble(this.bmi);
     }
     private void readFromParcel(Parcel in) {
-        title = in.readString();
-        name = in.readString();
+        userID = in.readString();
+        height = in.readDouble();
+        weight = in.readDouble();
         date = in.readString();
-        content = in.readString();
+        bmi = in.readDouble();
     }
 }
