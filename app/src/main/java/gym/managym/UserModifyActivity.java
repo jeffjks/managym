@@ -28,13 +28,7 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +36,7 @@ import java.util.Map;
 public class UserModifyActivity extends AppCompatActivity {
     private Bundle bundle;
     private UserListData userListData;
-    private ArrayList<String> trainerList = new ArrayList<String>();
+    private ArrayList<String> trainerList = new ArrayList<>();
     private AlertDialog dialog;
     private UserManagementActivity userManagementActivity = (UserManagementActivity) UserManagementActivity.userManagementActivity;
 
@@ -53,7 +47,6 @@ public class UserModifyActivity extends AppCompatActivity {
 
         //new UserModifyActivity.BackgroundTask().execute();
 
-        final boolean adminState;
         bundle = getIntent().getExtras();
         userListData = bundle.getParcelable("userListData");
         final TextView userIDText = findViewById(R.id.modifyUserID);
