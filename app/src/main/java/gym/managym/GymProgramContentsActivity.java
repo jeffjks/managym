@@ -58,11 +58,11 @@ public class GymProgramContentsActivity extends AppCompatActivity {
         if(userData.getAdmin() == 0) {
             getMenuInflater().inflate(R.menu.activity_menu_userattend, menu);
             MenuItem attendMenu = menu.findItem(R.id.menu_action_attend);
-            MenuItem cancleMenu = menu.findItem(R.id.menu_action_cancle);
+            MenuItem CancelMenu = menu.findItem(R.id.menu_action_cancel);
             if(myProgram) {
                 attendMenu.setVisible(false);
             } else {
-                cancleMenu.setVisible(false);
+                CancelMenu.setVisible(false);
             }
         }
         else {
@@ -87,8 +87,8 @@ public class GymProgramContentsActivity extends AppCompatActivity {
             case R.id.menu_action_attend:
                 attendProgram();
                 break;
-            case R.id.menu_action_cancle:
-                cancleProgram();
+            case R.id.menu_action_cancel:
+                CancelProgram();
                 break;
             default:
                 break;
@@ -187,7 +187,7 @@ public class GymProgramContentsActivity extends AppCompatActivity {
         queue.add(programAttend);
     }
 
-    private void cancleProgram() {
+    private void CancelProgram() {
         Response.Listener<String> responseListener = new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -223,9 +223,9 @@ public class GymProgramContentsActivity extends AppCompatActivity {
                 }
             }
         };
-        GymProgramCancle programCancle = new GymProgramCancle(userData.getUserID(), programData.getProgramNumToString(), responseListener);
+        GymProgramCancel programCancel = new GymProgramCancel(userData.getUserID(), programData.getProgramNumToString(), responseListener);
         RequestQueue queue = Volley.newRequestQueue(GymProgramContentsActivity.this);
-        queue.add(programCancle);
+        queue.add(programCancel);
     }
 
     private void refreshProgramIntent() {
@@ -377,15 +377,17 @@ class GymProgramAttend extends StringRequest {
     public Map<String, String> getParams() { return parameters;}
 }
 
-class GymProgramCancle extends StringRequest {
-    final static private String URL = "http://jeffjks.cafe24.com/ProgramCancle.php";
+class GymProgramCancel extends StringRequest {
+    final static private String URL = "http://jeffjks.cafe24.com/ProgramCancel.php";
     private Map<String, String> parameters;
 
-    public GymProgramCancle(String userID, String programNum, Response.Listener<String> listener) {
+    public GymProgramCancel(String userID, String programNum, Response.Listener<String> listener) {
         super(Method.POST, URL, listener, null);
         parameters = new HashMap<>();
         parameters.put("userID", userID);
         parameters.put("programNum", programNum);
+        Log.d("Tag", userID);
+        Log.d("Tag", programNum);
     }
 
     @Override
