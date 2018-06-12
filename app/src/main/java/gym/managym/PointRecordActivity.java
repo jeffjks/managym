@@ -55,13 +55,10 @@ public class PointRecordActivity extends AppCompatActivity {
         userData = bundle.getParcelable("userData");
         PointRecordActivity = PointRecordActivity.this;
 
-        final TextView textEmpty = findViewById(R.id.pointListEmpty);
-
         pointListView = findViewById(R.id.pointListView);
         pointList = new ArrayList<PointListView>();
         adapter = new PointListAdapter(getApplicationContext(), pointList);
         pointListView.setAdapter(adapter);
-        textEmpty.setVisibility(View.GONE);
 
         Response.Listener<String> responseListener = new Response.Listener<String>() {
             @Override
@@ -86,10 +83,6 @@ public class PointRecordActivity extends AppCompatActivity {
                 catch (Exception e) {
                     e.printStackTrace();
                 }
-                if (pointList.size() != 0)
-                    textEmpty.setVisibility(View.GONE);
-                else
-                    textEmpty.setVisibility(View.VISIBLE);
             }
         };
         PointRecordReceive pointRecordReceive = new PointRecordReceive(userData.getUserID(), responseListener);
@@ -231,7 +224,7 @@ class PointRecordReceive extends StringRequest {
     public PointRecordReceive(String userID, Response.Listener<String> listener) {
         super(Method.POST, URL, listener, null);
         parameters = new HashMap<>();
-        parameters.put("table", "PointRecord_"+userID);
+        parameters.put("table", "POINTRECORD_"+userID);
     }
 
     @Override

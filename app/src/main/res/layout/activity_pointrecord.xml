@@ -23,17 +23,6 @@
         android:textSize="25dp"
         android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/pointListEmpty"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="80dp"
-        android:layout_marginTop="80dp"
-        android:text="포인트 기록이 없습니다."
-        android:textColor="#052e43"
-        android:textSize="20dp" />
-
     <ListView
         android:id="@+id/pointListView"
         android:layout_width="match_parent"

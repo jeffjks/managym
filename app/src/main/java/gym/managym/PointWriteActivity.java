@@ -182,13 +182,13 @@ public class  PointWriteActivity extends AppCompatActivity {
     }
 
     class PointMinus extends StringRequest {
-        final static private String URL = "http://jeffjks.cafe24.com/Pointchange.php";
+        final static private String URL = "http://jeffjks.cafe24.com/PointChange.php";
         private Map<String, String> parameters;
 
         public PointMinus(String userID, String point, Response.Listener<String> listener) {
             super(Method.POST, URL, listener, null);
             parameters = new HashMap<>();
-            parameters.put("table", "PointRecord_" + userID);
+            parameters.put("userID", userID);
             parameters.put("point", point);
             parameters.put("totalPoint", String.valueOf(PointListView.totalPoint - Integer.parseInt(point)));
             parameters.put("remainPoint", String.valueOf(PointListView.remainPoint - Integer.parseInt(point)));
@@ -206,13 +206,13 @@ public class  PointWriteActivity extends AppCompatActivity {
 }
 
     class PointAdd extends StringRequest {
-        final static private String URL = "http://jeffjks.cafe24.com/Pointchange.php";
+        final static private String URL = "http://jeffjks.cafe24.com/PointChange.php";
         private Map<String, String> parameters;
 
         public PointAdd(String userID, String point, Response.Listener<String> listener) {
             super(Method.POST, URL, listener, null);
             parameters = new HashMap<>();
-            parameters.put("table", "PointRecord_" + userID);
+            parameters.put("userID", userID);
             parameters.put("point", point);
             parameters.put("totalPoint", String.valueOf(PointListView.totalPoint));
             parameters.put("remainPoint", String.valueOf(PointListView.remainPoint + Integer.parseInt(point)));
